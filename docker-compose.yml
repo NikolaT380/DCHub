@@ -1,0 +1,49 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    container_name: dchub-db
+    environment:
+      POSTGRES_DB: dchub
+      POSTGRES_USER: dchub_user
+      POSTGRES_PASSWORD: dchub_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - dchub-network
+
+  backend:
+    build: ./backend
+    container_name: dchub-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/dchub
+      SPRING_DATASOURCE_USERNAME: dchub_user
+      SPRING_DATASOURCE_PASSWORD: dchub_pass
+      JWT_SECRET: change-me-in-production
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - dchub-network
+
+  frontend:
+    build: ./frontend
+    container_name: dchub-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - dchub-network
+
+volumes:
+  postgres_data:
+
+networks:
+  dchub-network:
+    driver: bridge
