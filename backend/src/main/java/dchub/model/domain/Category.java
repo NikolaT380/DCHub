@@ -1,4 +1,4 @@
-package dchub.model;
+package dchub.model.domain;
 
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "categories")
 public class Category {
@@ -27,4 +25,9 @@ public class Category {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public Category(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }

@@ -1,11 +1,11 @@
-package dchub.service.impl;
+package dchub.service.domain.impl;
 
-import dchub.model.Category;
-import dchub.model.DataEntry;
-import dchub.model.User;
+import dchub.model.domain.Category;
+import dchub.model.domain.DataEntry;
+import dchub.model.domain.User;
 import dchub.repository.CategoryRepository;
 import dchub.repository.DataEntryRepository;
-import dchub.service.DataEntryService;
+import dchub.service.domain.DataEntryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -35,12 +35,7 @@ public class DataEntryServiceImpl implements DataEntryService {
     public DataEntry saveTextEntry(String title, String content, Long categoryId, User uploadedBy) {
         Category category = resolveCategory(categoryId);
 
-        DataEntry entry = DataEntry.builder()
-                .title(title)
-                .content(content)
-                .category(category)
-                .uploadedBy(uploadedBy)
-                .build();
+        DataEntry entry = new DataEntry(title, content, category, uploadedBy);
 
         return dataEntryRepository.save(entry);
     }
@@ -64,14 +59,7 @@ public class DataEntryServiceImpl implements DataEntryService {
             throw new RuntimeException("Failed to store file: " + originalName, e);
         }
 
-        DataEntry entry = DataEntry.builder()
-                .title(title)
-                .fileName(originalName)
-                .filePath(targetPath.toString())
-                .fileType(extension)
-                .category(category)
-                .uploadedBy(uploadedBy)
-                .build();
+        DataEntry entry = new DataEntry(title, originalName, targetPath.toString(), extension, category, uploadedBy);
 
         return dataEntryRepository.save(entry);
     }
@@ -92,8 +80,10 @@ public class DataEntryServiceImpl implements DataEntryService {
     }
 
     @Override
-    public void delete(Long id) {
-        dataEntryRepository.deleteById(id);
+    public Optional<DataEntry> delete(Long id) {
+        Optional<DataEntry> dataEntry = dataEntryRepository.findById(id);
+        dataEntry.ifPresent(dataEntryRepository::delete);
+        return dataEntry;
     }
 
 

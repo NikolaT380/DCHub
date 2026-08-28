@@ -1,4 +1,4 @@
-package dchub.model;
+package dchub.model.domain;
 
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "data_entries")
 public class DataEntry {
@@ -44,4 +42,20 @@ public class DataEntry {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    public DataEntry(String title, String content, Category category, User uploadedBy) {
+        this.title = title;
+        this.content = content;
+        this.category = category;
+        this.uploadedBy = uploadedBy;
+    }
+
+    public DataEntry(String title, String filePath, String fileName, String fileType, Category category, User uploadedBy) {
+        this.title = title;
+        this.filePath = filePath;
+        this.fileName = fileName;
+        this.fileType = fileType;
+        this.category = category;
+        this.uploadedBy = uploadedBy;
+    }
 }

@@ -1,4 +1,4 @@
-package dchub.model;
+package dchub.model.domain;
 
 public enum Role {
     USER,

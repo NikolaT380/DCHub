@@ -1,9 +1,9 @@
-package dchub.service.impl;
+package dchub.service.domain.impl;
 
-import dchub.model.Role;
-import dchub.model.User;
+import dchub.model.domain.Role;
+import dchub.model.domain.User;
 import dchub.repository.UserRepository;
-import dchub.service.UserService;
+import dchub.service.domain.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,12 +26,7 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Email already in use: " + email);
         }
 
-        User user = User.builder()
-                .username(username)
-                .email(email)
-                .passwordHash(passwordEncoder.encode(password))
-                .role(Role.USER)
-                .build();
+        User user = new User(username, email, password);
 
         return userRepository.save(user);
     }

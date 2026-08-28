@@ -1,7 +1,7 @@
 package dchub.repository;
 
-import dchub.model.DataEntry;
-import dchub.model.User;
+import dchub.model.domain.DataEntry;
+import dchub.model.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import org.springframework.data.domain.Page;
