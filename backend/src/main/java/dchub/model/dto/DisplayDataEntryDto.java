@@ -4,6 +4,8 @@ import dchub.model.domain.Category;
 import dchub.model.domain.DataEntry;
 import dchub.model.domain.User;
 
+import java.util.List;
+//TODO: Kako da napravam posebni za FileDataEntry i TextDataEntry
 public record DisplayDataEntryDto(
         Long id,
         String title,
@@ -25,6 +27,9 @@ public record DisplayDataEntryDto(
                 dataEntry.getCategory(),
                 dataEntry.getUploadedBy()
         );
+    }
 
+    public static List<DisplayDataEntryDto> from(List<DataEntry> dataEntries){
+        return dataEntries.stream().map(DisplayDataEntryDto::from).toList();
     }
 }

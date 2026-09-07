@@ -87,7 +87,6 @@ public class DataEntryServiceImpl implements DataEntryService {
     }
 
 
-
     private Category resolveCategory(Long categoryId) {
         if (categoryId == null) return null;
         return categoryRepository.findById(categoryId)

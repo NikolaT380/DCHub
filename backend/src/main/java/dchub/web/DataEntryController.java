@@ -14,7 +14,7 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/dataentries")
+@RequestMapping("/api/data_entries")
 public class DataEntryController {
     private final DataEntryApplicationService dataEntryApplicationService;
 
