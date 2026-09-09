@@ -1,8 +1,8 @@
-package dchub.service.impl;
+package dchub.service.domain.impl;
 
-import dchub.model.Category;
+import dchub.model.domain.Category;
 import dchub.repository.CategoryRepository;
-import dchub.service.CategoryService;
+import dchub.service.domain.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -31,16 +31,15 @@ public class CategoryServiceImpl implements CategoryService {
             throw new RuntimeException("Category already exists: " + name);
         }
 
-        Category category = Category.builder()
-                .name(name)
-                .description(description)
-                .build();
+        Category category = new Category(name, description);
 
         return categoryRepository.save(category);
     }
 
     @Override
-    public void delete(Long id) {
-        categoryRepository.deleteById(id);
+    public Optional<Category> delete(Long id) {
+        Optional<Category> category = categoryRepository.findById(id);
+        category.ifPresent(categoryRepository::delete);
+        return category;
     }
 }

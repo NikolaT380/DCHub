@@ -1,7 +1,7 @@
-package dchub.service;
+package dchub.service.domain;
 
-import dchub.model.DataEntry;
-import dchub.model.User;
+import dchub.model.domain.DataEntry;
+import dchub.model.domain.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -19,5 +19,5 @@ public interface DataEntryService {
 
     Optional<DataEntry> findById(Long id);
 
-    void delete(Long id);
+    Optional<DataEntry> delete(Long id);
 }

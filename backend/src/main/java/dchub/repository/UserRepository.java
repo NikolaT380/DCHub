@@ -1,6 +1,6 @@
 package dchub.repository;
 
-import dchub.model.User;
+import dchub.model.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
