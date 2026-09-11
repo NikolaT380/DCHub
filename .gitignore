@@ -56,3 +56,8 @@ Thumbs.db
 
 ### Database ###
 *.sql.bak
+
+### Storage ###
+storage/
+storage/*
+!storage/.gitkeep

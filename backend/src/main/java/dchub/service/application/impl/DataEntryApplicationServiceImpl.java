@@ -1,15 +1,15 @@
 package dchub.service.application.impl;
 
-import dchub.model.domain.Category;
+import dchub.model.domain.DataEntry;
+import dchub.model.domain.Role;
 import dchub.model.domain.User;
 import dchub.model.dto.CreateFileDataEntryDto;
 import dchub.model.dto.CreateTextDataEntryDto;
 import dchub.model.dto.DisplayDataEntryDto;
-import dchub.repository.CategoryRepository;
 import dchub.service.application.DataEntryApplicationService;
 import dchub.service.domain.DataEntryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,30 +18,29 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class DataEntryApplicationServiceImpl implements DataEntryApplicationService {
+
     private final DataEntryService dataEntryService;
 
     @Override
     public DisplayDataEntryDto saveTextEntry(CreateTextDataEntryDto createTextDataEntryDto) {
-        return DisplayDataEntryDto.from(dataEntryService.saveTextEntry(
-                createTextDataEntryDto.toDataEntry().getTitle(),
-                createTextDataEntryDto.toDataEntry().getContent(),
-                createTextDataEntryDto.toDataEntry().getCategory().getId(),
-                createTextDataEntryDto.toDataEntry().getUploadedBy()
+        return DisplayDataEntryDto.from(
+                dataEntryService.saveTextEntry(
+                        createTextDataEntryDto.title(),
+                        createTextDataEntryDto.content(),
+                        createTextDataEntryDto.categoryId(),
+                        createTextDataEntryDto.uploadedBy()
                 )
         );
     }
 
     @Override
     public DisplayDataEntryDto saveFileEntry(CreateFileDataEntryDto createFileDataEntryDto) {
-
-
-        return DisplayDataEntryDto.from(dataEntryService.saveFileEntry(
-                    createFileDataEntryDto.toDataEntry().getTitle(),
-                    createFileDataEntryDto.toDataEntry().getFilePath(),
-                    createFileDataEntryDto.toDataEntry().getFileName(),
-                    createFileDataEntryDto.toDataEntry().getFileType(),
-                    createFileDataEntryDto.toDataEntry().getCategory().getId(),
-                    createFileDataEntryDto.toDataEntry().getUploadedBy()
+        return DisplayDataEntryDto.from(
+                dataEntryService.saveFileEntry(
+                        createFileDataEntryDto.title(),
+                        createFileDataEntryDto.file(),
+                        createFileDataEntryDto.categoryId(),
+                        createFileDataEntryDto.uploadedBy()
                 )
         );
     }
@@ -62,7 +61,25 @@ public class DataEntryApplicationServiceImpl implements DataEntryApplicationServ
     }
 
     @Override
-    public Optional<DisplayDataEntryDto> delete(Long id) {
+    public Optional<DisplayDataEntryDto> delete(Long id, User currentUser) {
+        Optional<DataEntry> dataEntryOptional = dataEntryService.findById(id);
+
+        if (dataEntryOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        DataEntry dataEntry = dataEntryOptional.get();
+
+        boolean isAdmin = currentUser.getRole() == Role.ADMIN;
+
+        boolean isOwner = dataEntry.getUploadedBy()
+                .getUsername()
+                .equals(currentUser.getUsername());
+
+        if (!isAdmin && !isOwner) {
+            throw new AccessDeniedException("You may delete only your own data entries.");
+        }
+
         return dataEntryService.delete(id).map(DisplayDataEntryDto::from);
     }
 }

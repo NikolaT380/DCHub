@@ -1,18 +1,12 @@
 package dchub.model.dto;
 
-import dchub.model.domain.Category;
-import dchub.model.domain.DataEntry;
 import dchub.model.domain.User;
+import org.springframework.web.multipart.MultipartFile;
 
 public record CreateFileDataEntryDto(
         String title,
-        String filePath,
-        String fileName,
-        String fileType,
-        Category category,
+        MultipartFile file,
+        Long categoryId,
         User uploadedBy
 ) {
-    public DataEntry toDataEntry(){
-        return new DataEntry(title, filePath, fileName, fileType, category, uploadedBy);
-    }
 }

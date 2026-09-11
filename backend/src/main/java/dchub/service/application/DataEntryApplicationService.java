@@ -1,11 +1,9 @@
 package dchub.service.application;
 
-import dchub.model.domain.DataEntry;
 import dchub.model.domain.User;
 import dchub.model.dto.CreateFileDataEntryDto;
 import dchub.model.dto.CreateTextDataEntryDto;
 import dchub.model.dto.DisplayDataEntryDto;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,5 +19,5 @@ public interface DataEntryApplicationService {
 
     Optional<DisplayDataEntryDto> findById(Long id);
 
-    Optional<DisplayDataEntryDto> delete(Long id);
+    Optional<DisplayDataEntryDto> delete(Long id, User currentUser);
 }

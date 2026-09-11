@@ -23,7 +23,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/dchub
       SPRING_DATASOURCE_USERNAME: dchub_user
       SPRING_DATASOURCE_PASSWORD: dchub_pass
-      JWT_SECRET: change-me-in-production
+      JWT_SECRET: ${JWT_SECRET}
+      APP_STORAGE_PATH: /app/storage
+    volumes:
+      - ./storage:/app/storage
     ports:
       - "8080:8080"
     depends_on:

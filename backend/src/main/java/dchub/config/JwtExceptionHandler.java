@@ -3,7 +3,7 @@ package dchub.config;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
-import mk.ukim.finki.eshopbackend.web.dto.JwtExceptionResponseDto;
+import dchub.config.dto.JwtExceptionResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

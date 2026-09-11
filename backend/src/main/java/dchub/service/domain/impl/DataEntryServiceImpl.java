@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,24 +45,25 @@ public class DataEntryServiceImpl implements DataEntryService {
     @Override
     public DataEntry saveFileEntry(String title, MultipartFile file, Long categoryId, User uploadedBy) {
         Category category = resolveCategory(categoryId);
-
         String originalName = file.getOriginalFilename();
         String extension = getExtension(originalName);
         String storedName = UUID.randomUUID() + "." + extension;
-
         validateFileType(extension);
 
-        Path targetPath = Paths.get(storagePath).resolve(storedName);
+        Path storageDir = Paths.get(storagePath).toAbsolutePath().normalize();
+        Path targetPath = storageDir.resolve(storedName);
 
         try {
-            Files.createDirectories(targetPath.getParent());
-            file.transferTo(targetPath.toFile());
+            Files.createDirectories(storageDir);
+
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            }
         } catch (IOException e) {
             throw new RuntimeException("Failed to store file: " + originalName, e);
         }
 
-        DataEntry entry = new DataEntry(title, originalName, targetPath.toString(), extension, category, uploadedBy);
-
+        DataEntry entry = new DataEntry(title, targetPath.toString(), originalName, extension, category, uploadedBy);
         return dataEntryRepository.save(entry);
     }
 

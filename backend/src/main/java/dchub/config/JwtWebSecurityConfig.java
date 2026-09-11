@@ -46,7 +46,7 @@ public class JwtWebSecurityConfig {
     @Bean
     public RoleHierarchy roleHierarchy() {
         return RoleHierarchyImpl.withDefaultRolePrefix()
-            .role("ADMINISTRATOR").implies("USER")
+            .role("ADMIN").implies("USER")
             .build();
     }
 
@@ -73,35 +73,39 @@ public class JwtWebSecurityConfig {
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
                         "/api/user/register",
-                        "/api/user/login"
-                    )
-                    .permitAll()
-                    .requestMatchers(
-                        "/api/user/me"
-                    )
-                    .authenticated()
+                        "/api/user/login",
+                        "/error"
+                    ).permitAll()
+
+                    .requestMatchers("/api/user/me").authenticated()
+
                     .requestMatchers(
                         HttpMethod.GET,
                         "/api/categories",
-                        "/api/categories/{id}",
+                        "/api/categories/*",
                         "/api/data_entries",
-                        "/api/data_entries/{id}"
-                    )
-                    .hasRole("USER")
+                        "/api/data_entries/*",
+                        "/api/data_entries/my"
+                    ).hasRole("USER")
+
                     .requestMatchers(
                         HttpMethod.POST,
-                        "/api/categories/add",
-                        "/api/data_entries/add"
-                    )
-                    .hasRole("USER")
+                        "/api/data_entries/add-text",
+                        "/api/data_entries/add-file"
+                    ).hasRole("USER")
+
+                    .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
+
                     .requestMatchers(
                         HttpMethod.DELETE,
-                        "/api/categories/{id}/delete",
-                        "/api/products/{id}/delete"
-                    )
-                    .hasRole("ADMIN")
-                    .anyRequest()
-                    .hasRole("ADMIN")
+                        "/api/data_entries/*/delete"
+                    ).hasRole("USER")
+
+                    .requestMatchers(HttpMethod.GET, "/api/user/*").authenticated()
+
+                    .anyRequest().hasRole("ADMIN")
             )
             .sessionManagement(sessionManagementConfigurer ->
                 sessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
