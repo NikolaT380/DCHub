@@ -19,5 +19,7 @@ public interface DataEntryService {
 
     Optional<DataEntry> findById(Long id);
 
+    DataEntry update(Long id, String title, String content, Long categoryId);
+
     Optional<DataEntry> delete(Long id);
 }

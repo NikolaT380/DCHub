@@ -31,7 +31,7 @@ public class DataEntryServiceImpl implements DataEntryService {
     @Value("${app.storage.path}")
     private String storagePath;
 
-    private static final List<String> ALLOWED_TYPES = List.of("pdf", "docx", "xlsx", "csv", "txt");
+    private static final List<String> ALLOWED_TYPES = List.of("pdf", "docx", "xlsx", "csv", "txt", "pptx");
 
     @Override
     public DataEntry saveTextEntry(String title, String content, Long categoryId, User uploadedBy) {
@@ -83,10 +83,37 @@ public class DataEntryServiceImpl implements DataEntryService {
     }
 
     @Override
+    public DataEntry update(Long id, String title, String content, Long categoryId) {
+        DataEntry entry = dataEntryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("DataEntry not found: " + id));
+
+        Category category = resolveCategory(categoryId);
+        entry.setTitle(title);
+        if (content != null) {
+            entry.setContent(content);
+        }
+        entry.setCategory(category);
+
+        return dataEntryRepository.save(entry);
+    }
+
+    @Override
     public Optional<DataEntry> delete(Long id) {
-        Optional<DataEntry> dataEntry = dataEntryRepository.findById(id);
-        dataEntry.ifPresent(dataEntryRepository::delete);
-        return dataEntry;
+        Optional<DataEntry> dataEntryOptional = dataEntryRepository.findById(id);
+
+        dataEntryOptional.ifPresent(dataEntry -> {
+            if (dataEntry.getFilePath() != null && !dataEntry.getFilePath().isBlank()) {
+                try {
+                    Path path = Paths.get(dataEntry.getFilePath());
+                    Files.deleteIfExists(path);
+                } catch (IOException e) {
+                    System.err.println("Failed to delete the file:" + e.getMessage());
+                }
+            }
+            dataEntryRepository.delete(dataEntry);
+        });
+
+        return dataEntryOptional;
     }
 
 
@@ -103,7 +130,7 @@ public class DataEntryServiceImpl implements DataEntryService {
 
     private void validateFileType(String extension) {
         if (!ALLOWED_TYPES.contains(extension)) {
-            throw new RuntimeException("File type not allowed: " + extension);
+            throw new IllegalArgumentException("File type not allowed: " + extension);
         }
     }
 }

@@ -85,7 +85,13 @@ public class JwtWebSecurityConfig {
                         "/api/categories/*",
                         "/api/data_entries",
                         "/api/data_entries/*",
+                        "/api/data_entries/*/file",
                         "/api/data_entries/my"
+                    ).hasRole("USER")
+
+                    .requestMatchers(
+                        HttpMethod.PUT,
+                        "/api/data_entries/*"
                     ).hasRole("USER")
 
                     .requestMatchers(

@@ -4,13 +4,19 @@ import dchub.model.domain.User;
 import dchub.model.dto.CreateFileDataEntryDto;
 import dchub.model.dto.CreateTextDataEntryDto;
 import dchub.model.dto.DisplayDataEntryDto;
+import dchub.model.dto.UpdateDataEntryDto;
+import dchub.model.dto.FileDownloadDto;
 import dchub.service.application.DataEntryApplicationService;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import java.nio.charset.StandardCharsets;
 
 import java.util.List;
 
@@ -24,13 +30,6 @@ public class DataEntryController {
     @GetMapping
     public ResponseEntity<List<DisplayDataEntryDto>> findAll() {
         return ResponseEntity.ok(dataEntryApplicationService.findAll());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<DisplayDataEntryDto> findById(@PathVariable Long id) {
-        return dataEntryApplicationService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/my")
@@ -58,6 +57,42 @@ public class DataEntryController {
     ) {
         CreateFileDataEntryDto dto = new CreateFileDataEntryDto(title, file, categoryId, currentUser);
         return ResponseEntity.ok(dataEntryApplicationService.saveFileEntry(dto));
+    }
+
+    @GetMapping("/{id}/file")
+    public ResponseEntity<Resource> getFile(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "false") boolean download
+    ) {
+        FileDownloadDto fileDto = dataEntryApplicationService.loadFile(id);
+
+        String dispositionType = download ? "attachment" : "inline";
+        ContentDisposition disposition = ContentDisposition.builder(dispositionType)
+                .filename(fileDto.getOriginalFileName(), StandardCharsets.UTF_8)
+                .build();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(fileDto.getContentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
+                .body(fileDto.getResource());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DisplayDataEntryDto> findById(@PathVariable Long id) {
+        return dataEntryApplicationService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DisplayDataEntryDto> update(
+            @PathVariable Long id,
+            @RequestBody UpdateDataEntryDto dto,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        return dataEntryApplicationService.update(id, dto, currentUser)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}/delete")

@@ -8,8 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.security.SignatureException;
+import org.springframework.dao.DataIntegrityViolationException;
+import io.jsonwebtoken.security.SignatureException;
+import java.util.Map;
 
 @RestControllerAdvice
 public class JwtExceptionHandler {
@@ -63,6 +64,18 @@ public class JwtExceptionHandler {
             "The token is invalid.",
             request.getRequestURI()
         );
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, String>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", "Title too long! Maximum 255 characters allowed."));
     }
 }
 

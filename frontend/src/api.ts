@@ -73,6 +73,14 @@ export const dataEntryApi = {
         });
     },
 
+    update: (id: number, data: { title: string; content?: string; categoryId?: number }) =>
+        api.put<DataEntry>(`/data_entries/${id}`, data),
+
+    getFileBlob: (id: number, download: boolean = false) =>
+        api.get(`/data_entries/${id}/file?download=${download}`, {
+            responseType: 'blob',
+        }),
+
     delete: (id: number) =>
         api.delete<DataEntry>(`/data_entries/${id}/delete`),
 };

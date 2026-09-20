@@ -3,6 +3,7 @@ package dchub.model.dto;
 import dchub.model.domain.Category;
 import dchub.model.domain.DataEntry;
 import dchub.model.domain.User;
+import java.time.LocalDateTime;
 
 import java.util.List;
 //TODO: Kako da napravam posebni za FileDataEntry i TextDataEntry
@@ -14,9 +15,10 @@ public record DisplayDataEntryDto(
         String fileName,
         String fileType,
         Category category,
-        User uploadedBy
+        User uploadedBy,
+        LocalDateTime createdAt
 ) {
-    public static DisplayDataEntryDto from(DataEntry dataEntry){
+    public static DisplayDataEntryDto from(DataEntry dataEntry) {
         return new DisplayDataEntryDto(
                 dataEntry.getId(),
                 dataEntry.getTitle(),
@@ -25,7 +27,8 @@ public record DisplayDataEntryDto(
                 dataEntry.getFileName(),
                 dataEntry.getFileType(),
                 dataEntry.getCategory(),
-                dataEntry.getUploadedBy()
+                dataEntry.getUploadedBy(),
+                dataEntry.getCreatedAt()
         );
     }
 
